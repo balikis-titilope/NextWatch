@@ -22,6 +22,7 @@ from recommend import (
     generate_embeddings,
     build_title_index,
     build_user_profile,
+    build_user_profile_from_ratings,
     predict_user_interest,
     recommend_for_user,
     recommend_popular,
@@ -32,6 +33,7 @@ from recommend import (
     filter_by_year_range,
     get_movie_embedding,
 )
+from db.import_data import create_user, add_rating, get_user_ratings
 
 # ---------- SHARED STATE ----------
 # A plain dict that holds everything expensive to (re)compute.
@@ -65,14 +67,20 @@ app = FastAPI(title="Movie Discovery API", lifespan=lifespan)
 # FastAPI uses these to validate incoming requests automatically.
 
 class RecommendRequest(BaseModel):
-    liked_titles: list[str] = []       # optional now — empty list is valid (cold start)
-    mood_text: str | None = None       # e.g. "feeling grumpy, want something uplifting"
-    mood_weight: float = 0.5           # 0 = ignore mood, 1 = ignore taste, 0.5 = equal blend
+    user_id: int | None = None         # if given, pulls ratings from the DB
+    liked_titles: list[str] = []       # fallback for ad-hoc use without an account
+    mood_text: str | None = None
+    mood_weight: float = 0.5
     top_n: int = 10
     language: str | None = None
     actor: str | None = None
     start_year: int | None = None
     end_year: int | None = None
+
+class RatingRequest(BaseModel):
+    user_id: int
+    movie_id: int
+    rating: int
 
 class PredictRequest(BaseModel):
     liked_titles: list[str]
@@ -119,12 +127,31 @@ def recommend(req: RecommendRequest):
     title_to_index = state["title_to_index"]
     model = state["model"]
 
-    has_liked = len(req.liked_titles) > 0
-    has_mood = req.mood_text is not None and req.mood_text.strip() != ""
+    user_embedding = None
+    liked_indices = []
 
-    # Cold start: nothing to personalize with at all — filters don't
-    # need to account for any fetch, since nothing gets fetched here.
-    if not has_liked and not has_mood:
+    # Preferred path: pull real ratings from the database
+    if req.user_id is not None:
+        ratings = get_user_ratings(req.user_id)
+        if ratings:
+            user_embedding = build_user_profile_from_ratings(ratings, df, embeddings)
+            # exclude every rated movie (liked or disliked) from its own recommendations
+            rated_ids = [movie_id for movie_id, title, rating in ratings]
+            liked_indices = df[df["id"].isin(rated_ids)].index.tolist()
+
+    # Fallback path: ad-hoc liked_titles, for use without an account (e.g. quick testing)
+    has_liked_titles = user_embedding is None and len(req.liked_titles) > 0
+    if has_liked_titles:
+        df, embeddings, title_to_index, user_embedding, liked_indices = build_user_profile(
+            req.liked_titles, df, embeddings, title_to_index, model
+        )
+        state["df"], state["embeddings"], state["title_to_index"] = df, embeddings, title_to_index
+
+    has_mood = req.mood_text is not None and req.mood_text.strip() != ""
+    has_taste = user_embedding is not None
+
+    # Cold start: nothing to personalize with at all
+    if not has_taste and not has_mood:
         filtered_df = filter_by_language(df, req.language)
         filtered_df = filter_by_actor(filtered_df, req.actor)
         filtered_df = filter_by_year_range(filtered_df, req.start_year, req.end_year)
@@ -133,21 +160,8 @@ def recommend(req: RecommendRequest):
         results = recommend_popular(filtered_df, top_n=req.top_n)
         return results.to_dict(orient="records")
 
-    user_embedding = None
-    liked_indices = []
-
-    # Resolve liked titles FIRST — this may fetch+cache new movies from
-    # TMDB, growing df/embeddings. Filtering happens AFTER this, so any
-    # freshly-fetched liked movie is already present when we filter.
-    if has_liked:
-        df, embeddings, title_to_index, user_embedding, liked_indices = build_user_profile(
-            req.liked_titles, df, embeddings, title_to_index, model
-        )
-        state["df"], state["embeddings"], state["title_to_index"] = df, embeddings, title_to_index
-
     mood_embedding = build_mood_vector(req.mood_text, model) if has_mood else None
 
-    # NOW apply filters, against the fully up-to-date df/embeddings
     filtered_df = df
     filtered_embeddings = embeddings
     if req.language or req.actor or req.start_year or req.end_year:
@@ -227,3 +241,36 @@ def reload_data():
     running a fresh fetch_movies.py to pick up new movies."""
     load_all_data()
     return {"status": "reloaded", "movies_loaded": len(state["df"])}
+
+@app.get("/users/{user_id}/ratings")
+def get_ratings(user_id: int):
+    """
+    Fetch a user's full rating history — movie id, title, and rating.
+    Used by the Profile/History screen to show what the user has rated
+    and let them update ratings from there.
+    """
+    ratings = get_user_ratings(user_id)
+    if not ratings:
+        return []
+    return [
+        {
+            "movie_id": movie_id,
+            "title": title,
+            "rating": rating,
+        }
+        for movie_id, title, rating in ratings
+    ]
+
+@app.post("/users")
+def new_user():
+    """Create a minimal user record, returning its id."""
+    user_id = create_user()
+    return {"user_id": user_id}
+
+@app.post("/ratings")
+def rate_movie(req: RatingRequest):
+    """Insert or update a user's 1-5 rating for a movie."""
+    if not (1 <= req.rating <= 5):
+        raise HTTPException(status_code=400, detail="rating must be between 1 and 5")
+    add_rating(req.user_id, req.movie_id, req.rating)
+    return {"status": "saved", "user_id": req.user_id, "movie_id": req.movie_id, "rating": req.rating}

@@ -9,11 +9,12 @@ NextWatch is a movie recommendation application that surfaces relevant films usi
 - Python-based recommendation logic
 
 ## Project Structure
-- main.py – app entry point
-- ecommend.py – recommendation logic
-- etch_movies.py – movie data fetching workflow
-- db/import_data.py – database schema and import script
-- data/ – local sample data files
+- main.py ï¿½ app entry point
+- 
+Recommend.py ï¿½ recommendation logic
+- etch_movies.py ï¿½ movie data fetching workflow
+- db/import_data.py ï¿½ database schema and import script
+- data/ ï¿½ local sample data files
 
 ## Tech Stack
 - Python
