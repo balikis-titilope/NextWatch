@@ -22,7 +22,7 @@ export function Chip({ label, active, onPress, onClear }: Props) {
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ selected: active }}
-      className="-m-2 p-2"
+      className="-m-2 max-w-[260px] p-2"
     >
       <View
         className={`h-7 flex-row items-center justify-center gap-1 rounded-full px-3 ${
@@ -30,7 +30,8 @@ export function Chip({ label, active, onPress, onClear }: Props) {
         }`}
       >
         <Text
-          className={`font-label text-body-sm ${active ? "text-white" : "text-text-secondary"}`}
+          numberOfLines={1}
+          className={`flex-shrink font-label text-body-sm ${active ? "text-white" : "text-text-secondary"}`}
         >
           {label}
         </Text>

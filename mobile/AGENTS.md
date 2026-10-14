@@ -21,7 +21,7 @@ NextWatch helps people decide what to watch next by learning their taste from mo
 - **NativeWind v4** — Tailwind classes as the primary styling API (works across native and web)
 - **Zustand** — small global client state
 - **TanStack Query v5** — all server data fetching/caching/mutations against the FastAPI backend
-- **@expo-google-fonts/playfair-display**, **@expo-google-fonts/inter** — per `design.md` §3
+- **@expo-google-fonts/playfair-display**, **@expo-google-fonts/jost** — per `design.md` §3
 - **@expo/vector-icons** (Ionicons) — per `design.md` §5
 - **@react-native-async-storage/async-storage** — theme-preference persistence only (not tokens — see §12)
 - **expo-secure-store** — access/refresh token storage (Supabase Auth)

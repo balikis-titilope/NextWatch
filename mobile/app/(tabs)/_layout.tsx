@@ -16,6 +16,7 @@ export default function TabsLayout() {
       screenOptions={{
         // Logo + wordmark at the top of every tab screen.
         header: () => <AppHeader />,
+        sceneStyle: { backgroundColor: theme["bg-primary"] },
         tabBarActiveTintColor: theme["accent-primary"],
         tabBarInactiveTintColor: theme["text-secondary"],
         // A floating dock: inset from the edges, rounded, no top rule.

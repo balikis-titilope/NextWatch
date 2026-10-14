@@ -338,8 +338,8 @@ export default function SearchScreen() {
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              className="px-4"
-              contentContainerStyle={{ gap: 8 }}
+              className="flex-1"
+              contentContainerStyle={{ gap: 8, paddingHorizontal: 16, alignItems: "center" }}
             >
               <Chip
                 label={languageChipLabel}

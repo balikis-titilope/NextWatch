@@ -34,8 +34,6 @@ module.exports = {
       // before Inter/Playfair finish loading. Native takes the first entry
       // only, so these never change native text.
       fontFamily: {
-        // Hero headline only (HeroCarousel): the elegant film-credits serif.
-        hero: ["CormorantGaramond_700Bold", "Georgia", "serif"],
         "display-xl": ["PlayfairDisplay_700Bold", "Georgia", "serif"],
         "display-lg": ["PlayfairDisplay_700Bold", "Georgia", "serif"],
         "display-md": ["PlayfairDisplay_600SemiBold", "Georgia", "serif"],

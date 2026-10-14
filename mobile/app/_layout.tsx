@@ -1,5 +1,4 @@
 import "../global.css";
-import { CormorantGaramond_700Bold } from "@expo-google-fonts/cormorant-garamond";
 import { Jost_400Regular, Jost_600SemiBold } from "@expo-google-fonts/jost";
 import {
   PlayfairDisplay_600SemiBold,
@@ -37,7 +36,6 @@ export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     Jost_400Regular,
     Jost_600SemiBold,
-    CormorantGaramond_700Bold,
     PlayfairDisplay_600SemiBold,
     PlayfairDisplay_700Bold,
   });
@@ -135,7 +133,14 @@ function RootStack() {
   const theme = useTheme();
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    // contentStyle: react-navigation's default screen background follows the OS
+    // scheme, not NativeWind's, and shows through around the floating tab dock.
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: theme["bg-primary"] },
+      }}
+    >
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="movie/[type]/[id]" options={{ presentation: "card" }} />

@@ -15,6 +15,7 @@ import {
 import { usePageGutter } from "../hooks/usePageGutter";
 import { HERO_LINES } from "../constants/heroContent";
 import { useTheme } from "../hooks/useTheme";
+import { dark } from "../constants/colors.cjs";
 import type { MovieCard } from "../types/api";
 
 const ADVANCE_MS = 6000;
@@ -25,6 +26,9 @@ const HEADER_BAR = 56;
 const TITLE_ROW_RESERVE = 100;
 const HEIGHT = 320;
 const HEIGHT_WIDE = 520;
+// Scrim colors per mode: black in dark mode, the cream page tone in light mode
+// so the backdrop doesn't read as a dark block on a light page.
+const SCRIM = { dark: "0,0,0", light: "245,240,232" } as const;
 const FILL = { position: "absolute", top: 0, right: 0, bottom: 0, left: 0 } as const;
 
 interface Props {
@@ -38,6 +42,14 @@ interface Props {
 // current title (tap it to open the title).
 export function HeroCarousel({ slides }: Props) {
   const theme = useTheme();
+  const isDark = theme === dark;
+  const scrim = isDark ? SCRIM.dark : SCRIM.light;
+  const a = (alpha: number) => `rgba(${scrim},${alpha})`;
+  // Text/icons over the artwork: white on the dark scrim, page ink on the light one.
+  const inkClass = isDark ? "text-white" : "text-text-primary";
+  const inkMutedClass = isDark ? "text-white/70" : "text-text-secondary";
+  const inkColor = isDark ? "white" : theme["text-primary"];
+  const arrowBg = isDark ? "bg-black/40" : "bg-white/60";
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const headerOffset = insets.top + HEADER_BAR;
@@ -50,7 +62,7 @@ export function HeroCarousel({ slides }: Props) {
     paddingHorizontal: gutter,
   } as const;
   // Hero-sized type that grows with the window: phone, tablet, desktop.
-  const titleSize = width >= DESKTOP_BREAKPOINT ? 90 : width >= WIDE_BREAKPOINT ? 80 : 44;
+  const titleSize = width >= DESKTOP_BREAKPOINT ? 80 : width >= WIDE_BREAKPOINT ? 60 : 40;
   const subtitleSize = width >= DESKTOP_BREAKPOINT ? 24 : width >= WIDE_BREAKPOINT ? 20 : 16;
   const [index, setIndex] = useState(0);
   const count = slides.length;
@@ -87,7 +99,7 @@ export function HeroCarousel({ slides }: Props) {
       <LinearGradient
         colors={
           uri
-            ? ["rgba(0,0,0,0.7)", "rgba(0,0,0,0.2)"]
+            ? [a(isDark ? 0.7 : 0.3), a(isDark ? 0.2 : 0.05)]
             : [theme["accent-primary"], theme["bg-secondary"]]
         }
         start={{ x: uri ? 0.5 : 0, y: 0 }}
@@ -98,7 +110,7 @@ export function HeroCarousel({ slides }: Props) {
         // Left-to-right scrim behind the headline, easing out so there is no
         // visible edge across the artwork.
         <LinearGradient
-          colors={["rgba(0,0,0,0.6)", "rgba(0,0,0,0.25)", "rgba(0,0,0,0)"]}
+          colors={[a(isDark ? 0.6 : 0.5), a(isDark ? 0.25 : 0.2), a(0)]}
           locations={[0, 0.5, 1]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
@@ -107,7 +119,7 @@ export function HeroCarousel({ slides }: Props) {
       ) : null}
       {uri ? (
         <LinearGradient
-          colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.75)"]}
+          colors={[a(0), a(isDark ? 0.75 : 0.6)]}
           start={{ x: 0, y: 0.55 }}
           end={{ x: 0, y: 1 }}
           style={FILL}
@@ -135,13 +147,13 @@ export function HeroCarousel({ slides }: Props) {
         >
           <Text
             style={{ fontSize: titleSize, lineHeight: titleSize * 1.15 }}
-            className={`font-hero ${uri ? "text-white" : "text-text-primary"}`}
+            className={`font-display-xl ${uri ? inkClass : "text-text-primary"}`}
           >
             {copy.headline}
           </Text>
           <Text
             style={{ fontSize: subtitleSize, lineHeight: subtitleSize * 1.5 }}
-            className={`font-label ${uri ? "text-white" : "text-text-secondary"}`}
+            className={`font-label ${uri ? inkClass : "text-text-secondary"}`}
           >
             {copy.line}
           </Text>
@@ -157,13 +169,15 @@ export function HeroCarousel({ slides }: Props) {
               accessibilityLabel={current.title}
               className="flex-1 gap-1"
             >
-              <Text className="font-label text-caption uppercase tracking-widest text-white/70">
+              <Text
+                className={`font-label text-caption uppercase tracking-widest ${inkMutedClass}`}
+              >
                 Picked for you
               </Text>
               <Text
                 numberOfLines={2}
                 style={{ fontSize: width >= WIDE_BREAKPOINT ? 32 : 24 }}
-                className="font-display-lg text-white"
+                className={`font-display-lg ${inkClass}`}
               >
                 {current.title}
               </Text>
@@ -175,18 +189,18 @@ export function HeroCarousel({ slides }: Props) {
                   accessibilityRole="button"
                   accessibilityLabel="Previous title"
                   hitSlop={8}
-                  className="h-10 w-10 items-center justify-center rounded-full bg-black/40"
+                  className={`h-10 w-10 items-center justify-center rounded-full ${arrowBg}`}
                 >
-                  <Ionicons name="chevron-back" size={22} color="white" />
+                  <Ionicons name="chevron-back" size={22} color={inkColor} />
                 </Pressable>
                 <Pressable
                   onPress={() => step(1)}
                   accessibilityRole="button"
                   accessibilityLabel="Next title"
                   hitSlop={8}
-                  className="h-10 w-10 items-center justify-center rounded-full bg-black/40"
+                  className={`h-10 w-10 items-center justify-center rounded-full ${arrowBg}`}
                 >
-                  <Ionicons name="chevron-forward" size={22} color="white" />
+                  <Ionicons name="chevron-forward" size={22} color={inkColor} />
                 </Pressable>
               </View>
             ) : null}
