@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Color tokens (design.md §2.2/§2.3), as RGB triplets for Tailwind's
+   rgb(var(...) / <alpha-value>) opacity syntax. Values generated from
+   constants/colors.cjs, the single source of truth. */
+:root {
+  --color-bg-primary: 245 240 232;
+  --color-bg-secondary: 237 232 223;
+  --color-bg-tertiary: 224 217 206;
+  --color-text-primary: 26 22 18;
+  --color-text-secondary: 92 79 67;
+  --color-text-disabled: 168 159 148;
+  --color-accent-primary: 196 62 32;
+  --color-accent-hover: 163 51 24;
+  --color-gold: 212 160 23;
+  --color-success: 30 132 73;
+  --color-trust: 26 107 153;
+  --color-error: 192 57 43;
+  --color-divider: 212 206 196;
+}
+
+/* `.dark:root`, not a bare `.dark`: NativeWind only treats this form as the
+   dark set of root variables on native (react-native-css-interop's
+   isRootDarkVariableSelector). On web both match <html class="dark">. */
+.dark:root {
+  --color-bg-primary: 26 22 18;
+  --color-bg-secondary: 37 32 24;
+  --color-bg-tertiary: 46 40 32;
+  --color-text-primary: 242 237 228;
+  --color-text-secondary: 168 159 148;
+  --color-text-disabled: 92 85 78;
+  --color-accent-primary: 232 80 46;
+  --color-accent-hover: 196 62 32;
+  --color-gold: 240 192 64;
+  --color-success: 39 174 96;
+  --color-trust: 41 128 185;
+  --color-error: 231 76 60;
+  --color-divider: 58 50 40;
+}
+
+/* TextField.tsx already renders its own focus indicator (an animated
+   border-color transition, design.md §7's "Input Field" spec) -- the
+   browser's default focus outline on the underlying <input> is a second,
+   unstyled ring on top of that, not something the design calls for. */
+input:focus {
+  outline: none;
+}
+
+/* Visible keyboard focus on web links and buttons (spec 0011 AC-14);
+   mouse clicks do not trigger :focus-visible. */
+a:focus-visible,
+[role="button"]:focus-visible,
+[role="link"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid rgb(var(--color-accent-primary));
+  outline-offset: 2px;
+}

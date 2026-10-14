@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nextwatch"
+version = "0.1.0"
+description = "Movie Recommendation System"
+dependencies = [
+    "fastapi[standard]>=0.110.0",
+    "uvicorn[standard]>=0.29.0",
+    "pydantic>=2.0.0",
+    "fastembed>=0.3.0",
+    "numpy>=1.26.0",
+    "pandas>=2.2.0",
+    "psycopg2-binary>=2.9.9",
+    "requests>=2.31.0",
+    "python-dotenv>=1.0.0",
+    "pyjwt>=2.8.0",
+    "cryptography>=42.0.0",
+    "apscheduler>=3.10.0",
+    "slowapi>=0.1.9"
+]
+
+[tool.fastapi]
+app = "main:app"
+
+# An app, not a library: install the dependencies only, never build/package the project itself.
+[tool.uv]
+package = false
+
+# Explicit list so setuptools never auto-discovers (main, auth, recommend, db, data, legal...).
+# The app runs from the source folder, so nothing here is imported from site-packages.
+[tool.setuptools]
+py-modules = ["main", "auth", "recommend"]
+packages = []

@@ -1,0 +1,33 @@
+# NextWatch — Backend Requirements
+# Install with: pip install -r requirements.txt
+
+# API
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+pydantic>=2.0.0
+fastapi[standard]>=0.110.0
+
+# ML / Recommendations
+fastembed>=0.3.0
+numpy>=1.26.0
+pandas>=2.2.0
+
+# Database
+psycopg2-binary>=2.9.9
+
+# TMDB data fetching
+requests>=2.31.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Auth (Supabase Auth JWT verification, incl. ES256 JWKS via PyJWKClient)
+pyjwt>=2.8.0
+cryptography>=42.0.0
+
+# Scheduling (daily re-engagement notification scan, spec 0006)
+# v3, not v4 -- v4 isn't published on PyPI yet despite the bundled skill's examples
+apscheduler>=3.10.0
+
+# Rate limiting (POST /legal/delete-account, spec 0009 AC-9)
+slowapi>=0.1.9

@@ -1,8 +1,21 @@
-*.pyc\n__pycache__/\n.env\n.ipynb_checkpoints/\n*.pyo\n*.pyd\n.DS_Store\n
-
 .env
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
-data/
+*.pyo
+*.pyd
+.DS_Store
 venv
+.agents/
+.claude
+.fastapicloud/
+.venv/
+*.json
+docs/
+
+
+# Full TMDB dump (~900 MB), too large to deploy; app loads data/movies_test.csv
+data/movies.csv
+
+# Frozen reference results for the pgvector engine check (spec 0013, AC-3)
+!golden/*.json
