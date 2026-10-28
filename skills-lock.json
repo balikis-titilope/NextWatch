@@ -18,6 +18,12 @@
       "sourceType": "github",
       "skillPath": "skills/sentry-react-native-sdk/SKILL.md",
       "computedHash": "89f79da0832352bc81dc6b168de23219874672b4400b3e8a14346fed24fc64c4"
+    },
+    "wrangler": {
+      "source": "cloudflare/skills",
+      "sourceType": "github",
+      "skillPath": "skills/wrangler/SKILL.md",
+      "computedHash": "9eed4d658a9e8741d17cd4666701d25d4ca302a253dd62080338f473d051c50e"
     }
   }
 }

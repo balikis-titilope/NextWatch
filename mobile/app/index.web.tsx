@@ -11,6 +11,7 @@ import { LandingHero } from "../components/landing/LandingHero";
 import { LandingHowItWorks } from "../components/landing/LandingHowItWorks";
 import { LandingNav } from "../components/landing/LandingNav";
 import { LANDING_DESCRIPTION, LANDING_TITLE, type NavSection } from "../constants/landingContent";
+import { SITE_URL } from "../lib/siteConfig";
 import { trackEvent } from "../lib/telemetry";
 import { useSessionStore } from "../store/sessionStore";
 
@@ -69,7 +70,9 @@ export default function LandingPage() {
         <meta property="og:site_name" content="NextWatch" />
         <meta property="og:title" content={LANDING_TITLE} />
         <meta property="og:description" content={LANDING_DESCRIPTION} />
-        <meta property="og:image" content="/landing-share.png" />
+        <meta property="og:image" content={`${SITE_URL ?? ""}/landing-share.png`} />
+        {SITE_URL ? <link rel="canonical" href={`${SITE_URL}/`} /> : null}
+        {SITE_URL ? <meta property="og:url" content={`${SITE_URL}/`} /> : null}
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
       <LandingNav onNavigate={scrollTo} onCta={trackCta} />

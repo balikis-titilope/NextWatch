@@ -1,5 +1,6 @@
 import { ScrollViewStyleReset } from "expo-router/html";
 import type { PropsWithChildren } from "react";
+import { NOINDEX } from "../lib/siteConfig";
 
 // Runs before first paint (spec 0011): picks the stored manual theme, else
 // the OS setting, and sets the "dark" class NativeWind's darkMode: "class"
@@ -14,6 +15,8 @@ export default function Root({ children }: PropsWithChildren) {
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        {/* Preview builds only (spec 0014 rule 5): keep preview addresses out of search. */}
+        {NOINDEX ? <meta name="robots" content="noindex, nofollow" /> : null}
         <ScrollViewStyleReset />
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>

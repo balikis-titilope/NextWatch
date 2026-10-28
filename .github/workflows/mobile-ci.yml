@@ -11,6 +11,14 @@ on:
     paths:
       - "mobile/**"
       - ".github/workflows/mobile-ci.yml"
+  # Reused by mobile-release.yml and mobile-update.yml so every
+  # release runs the same checks on the exact commit it ships (spec 0014 rule 1).
+  workflow_call:
+    inputs:
+      ref:
+        description: "Commit or tag to check. Empty means the commit that started the run."
+        type: string
+        default: ""
 
 defaults:
   run:
@@ -22,6 +30,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
 
       - name: Use Node.js 20.x
         uses: actions/setup-node@v4

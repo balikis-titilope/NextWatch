@@ -26,6 +26,7 @@ NextWatch helps people decide what to watch next by learning their taste from mo
 | 14 | Web landing page | Journey 1 | in-progress |
 | 15 | Web auth split screen | Journey 1 | in-progress |
 | 16 | Catalog in Postgres (pgvector) | Backend data layer | in-progress |
+| 17 | Web and mobile deployment | Release readiness | in-progress |
 
 ## Foundations
 
@@ -189,6 +190,19 @@ spec [0009](../specs/0009-app-store-submission-readiness/index.md) · code in `m
 - [ ] Verify it: `/check verify app store submission readiness`
 - [ ] Test it: `/test app store submission readiness`
 
+### 17. Web and mobile deployment · Release readiness
+Gives the web app a public home and turns releases into a repeatable, tested step. Web is hosted on Cloudflare Workers from GitHub Actions with a preview per pull request; iOS and Android builds start from a version tag on EAS and submit to the test tracks only; JavaScript fixes ship through a manual EAS Update. The backend stays on FastAPI Cloud. Closes the open hosting follow up in spec 0011 and the pipeline half of spec 0009.
+**Done when:** a merge to `main` publishes the web app at its public address after the checks pass, a pull request gets a preview address, a `vX.Y.Z` tag that matches `app.config.ts` builds both apps on EAS and lands them in TestFlight and Google Play internal testing, and a manual update reaches an installed build on the `production` channel.
+spec [0014](../specs/0014-web-and-mobile-deployment/index.md) · code in `.github/workflows/`, `mobile/wrangler.jsonc`, `mobile/public/_redirects`, `mobile/eas.json`, `mobile/app.config.ts`, `mobile/app/+html.tsx`, `mobile/app/index.web.tsx`
+- [x] Design it (spec): `/architect deployment`
+- [ ] Build it: `/develop deployment`
+  - [x] Web hosting: `wrangler.jsonc`, `_redirects` deep link rewrite, `SITE_URL` and `NOINDEX` wired into `+html.tsx` and `index.web.tsx`, `web-deploy.yml` with per pull request previews
+  - [ ] Mobile release: `eas init`, EAS and `expo-updates` fields in `app.config.ts`, `eas.json` channels, environments, `ascAppId`, removed service account path, `mobile-release.yml` with the tag checks
+  - [x] Over the air updates: `mobile-update.yml` with the `tag` input, `--environment production`, Sentry source maps
+  - [ ] Manual prerequisites done and recorded: Cloudflare account, store enrollments, `eas credentials`, EAS environment variables, GitHub secrets and variables, `v*` tag ruleset
+- [ ] Verify it: `/check verify deployment`
+- [ ] Test it: `/test deployment`
+
 ## Journey 7: TV show support
 
 ### 13. TV show support
@@ -259,6 +273,8 @@ Out of scope for this build pass, kept so the plan stays honest.
 - **Niche out of catalog candidates**: the catalog is capped, so a very niche taste can miss its best match outside it. Using TMDB `/similar` and `/recommendations` to fetch and embed those candidates live, then merge them with catalog results, is deferred until the catalog is loaded and results can be judged (from spec [0013](../specs/0013-pgvector-catalog/index.md)).
 - **Mobile handling of `503` with `Retry-After`**: after a cold start, mood requests can return `503` for about a minute while the embedding model loads. The mobile app has no retry or friendly message for it yet (from spec [0013](../specs/0013-pgvector-catalog/index.md)).
 - **Landing page stats block and About page**: spec [0011](../specs/0011-web-landing-page.md) leaves out the "Join the Cinephiles" numbers (no real figures or backend totals yet) and the "About" link (no content). Bring them back once real numbers and copy exist.
+
+- **Staging backend and database**: web previews and test builds call the production API and write real data (from spec [0014](../specs/0014-web-and-mobile-deployment/index.md)). A separate staging environment is deferred until a real tester or user base makes that risk matter.
 
 ## Legend
 

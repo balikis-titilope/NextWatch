@@ -62,7 +62,7 @@ export function HeroCarousel({ slides }: Props) {
     paddingHorizontal: gutter,
   } as const;
   // Hero-sized type that grows with the window: phone, tablet, desktop.
-  const titleSize = width >= DESKTOP_BREAKPOINT ? 80 : width >= WIDE_BREAKPOINT ? 60 : 40;
+  const titleSize = width >= DESKTOP_BREAKPOINT ? 80 : width >= WIDE_BREAKPOINT ? 60 : 44;
   const subtitleSize = width >= DESKTOP_BREAKPOINT ? 24 : width >= WIDE_BREAKPOINT ? 20 : 16;
   const [index, setIndex] = useState(0);
   const count = slides.length;
@@ -176,7 +176,7 @@ export function HeroCarousel({ slides }: Props) {
               </Text>
               <Text
                 numberOfLines={2}
-                style={{ fontSize: width >= WIDE_BREAKPOINT ? 32 : 24 }}
+                style={{ fontSize: width >= WIDE_BREAKPOINT ? 32 : 20 }}
                 className={`font-display-lg ${inkClass}`}
               >
                 {current.title}

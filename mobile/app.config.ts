@@ -12,6 +12,11 @@ const config: ExpoConfig = {
   // from switching the app, so the Profile toggle left OS-driven text and
   // controls in the wrong scheme. app/_layout.tsx still defaults to dark.
   userInterfaceStyle: "automatic",
+  // Over the air updates (spec 0014 rule 7): an update only reaches builds with
+  // the same app version, so a native change means bumping `version` above.
+  // TODO after the first `eas init` (spec 0014, manual prerequisites): add
+  // `owner`, `updates.url` and `extra.eas.projectId` here. They are not secrets.
+  runtimeVersion: { policy: "appVersion" },
   newArchEnabled: true,
   ios: {
     supportsTablet: true,

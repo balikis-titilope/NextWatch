@@ -45,3 +45,6 @@ yarn-error.*
 assets
 context/
 
+
+# Wrangler local state (spec 0014)
+.wrangler/

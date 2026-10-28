@@ -1,6 +1,18 @@
 {
   "version": 1,
   "skills": {
+    "eas-app-stores": {
+      "source": "expo/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/expo/skills/eas-app-stores/SKILL.md",
+      "computedHash": "5e6e23df7a7d88aa72bc5dee63bc059e174f044ce46e5df4faee5a872f547cee"
+    },
+    "eas-update": {
+      "source": "expo/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/expo/skills/eas-update/SKILL.md",
+      "computedHash": "3c501a0d7a9563574d5f5dcb1a12ab8c0cf9d9f7d9b459c49f00eb3ea2bfc47d"
+    },
     "eas-workflows": {
       "source": "expo/skills",
       "sourceType": "github",

@@ -26,6 +26,8 @@ NextWatch helps people decide what to watch next by learning their taste from mo
 - **@react-native-async-storage/async-storage** — theme-preference persistence only (not tokens — see §12)
 - **expo-secure-store** — access/refresh token storage (Supabase Auth)
 - **expo-linear-gradient** — hero/backdrop overlays per `design.md` §2.4
+- **expo-updates** — over the air JavaScript updates through EAS Update (spec 0014); the runtime policy is `appVersion`, so a native change needs a `version` bump and a new tag
+- **wrangler** (devDependency, exact pin 4.135.0 or later) — uploads the web export to Cloudflare Workers from CI only (spec 0014)
 - Backend base URL from `EXPO_PUBLIC_API_BASE_URL` — never hardcoded, never pointed at TMDB or Postgres directly
 
 Don't add a library outside this list without asking first (see §13).
