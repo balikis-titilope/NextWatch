@@ -1,0 +1,78 @@
+name: Mobile release
+
+# Pushing a tag like v1.2.3 builds the iOS and Android apps on EAS and submits
+# them to TestFlight and Google Play internal testing (spec 0014). Reaching
+# public store review stays a manual click in each store.
+#
+# Repository secret: EXPO_TOKEN (an Expo access token for the account).
+# The EXPO_PUBLIC_* and Sentry values come from the EAS "production" environment,
+# because the build runs on EAS servers, not here.
+#
+# The run only proves EAS accepted the build (--no-wait). A build or submit
+# failure arrives as an Expo email and on the EAS dashboard.
+# Build numbers and version codes stay with the EAS remote counters (spec 0009).
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+# Each tag has its own group, so no release is dropped or cancelled.
+concurrency:
+  group: mobile-release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    uses: ./.github/workflows/mobile-ci.yml
+
+  release:
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check the tag matches the app version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          app_version=$(npx expo config --json --type public | jq -r .version)
+          if [ "${TAG#v}" != "$app_version" ]; then
+            echo "::error::Tag $TAG does not match version $app_version in mobile/app.config.ts."
+            exit 1
+          fi
+
+      - name: Check the tagged commit is on main
+        run: |
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::The tagged commit is not on main. Tag a commit that has been merged."
+            exit 1
+          fi
+
+      - name: Set up EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: 24.14.0
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build and submit
+        run: eas build --platform all --profile production --non-interactive --auto-submit --no-wait

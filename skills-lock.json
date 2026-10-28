@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "github-actions-templates": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "skillPath": "plugins/cicd-automation/skills/github-actions-templates/SKILL.md",
+      "computedHash": "d57f2a45525180e30d9130aeab1613930c274917c5002899d8c37185594de411"
+    },
+    "instrument-product-analytics": {
+      "source": "posthog/ai-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/instrument-product-analytics/SKILL.md",
+      "computedHash": "101090610a85ec9ffe39f9bd0c960c35273cd993bd747ea35c638966d3a20c73"
+    },
+    "sentry-react-native-sdk": {
+      "source": "getsentry/sentry-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/sentry-react-native-sdk/SKILL.md",
+      "computedHash": "89f79da0832352bc81dc6b168de23219874672b4400b3e8a14346fed24fc64c4"
+    },
+    "wrangler": {
+      "source": "cloudflare/skills",
+      "sourceType": "github",
+      "skillPath": "skills/wrangler/SKILL.md",
+      "computedHash": "9eed4d658a9e8741d17cd4666701d25d4ca302a253dd62080338f473d051c50e"
+    }
+  }
+}

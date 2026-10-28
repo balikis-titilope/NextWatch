@@ -1,0 +1,10 @@
+{
+  "tool": "jest",
+  "gate": null,
+  "additionalTools": ["jest-expo", "@testing-library/react-native"],
+  "e2eTool": "none",
+  "testDir": "beside the source; app/**/__tests__/ for route files (Expo Router treats other app/ files as routes)",
+  "filePattern": "*.test.ts / *.test.tsx",
+  "packageManager": "npm",
+  "packageRoot": "mobile"
+}

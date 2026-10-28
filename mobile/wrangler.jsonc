@@ -1,0 +1,13 @@
+{
+  // Static web hosting for the Expo web export (spec 0014). Built and deployed
+  // by Cloudflare Workers Builds from the GitHub repo (root directory: mobile).
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nextwatch-web",
+  "compatibility_date": "2026-09-25",
+  "assets": {
+    "directory": "./dist",
+    // Unknown paths return the exported 404.html with a real 404 status, so the
+    // landing page is never served for a deep link (spec 0014 rule 6).
+    "not_found_handling": "404-page",
+  },
+}

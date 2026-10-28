@@ -1,0 +1,108 @@
+name: Mobile update
+
+# Sends a JavaScript only fix to installed apps through EAS Update (spec 0014),
+# without a store release. Started by hand: Actions > Mobile update > Run
+# workflow, then type the release tag (for example v1.2.3). Only the latest
+# released tag is accepted, and the checks run on that tag first.
+#
+# An update only reaches builds with the same app version (runtime policy
+# appVersion). A native change needs a new version and a new tag instead.
+#
+# Repository secrets: EXPO_TOKEN, SENTRY_AUTH_TOKEN.
+# The EXPO_PUBLIC_* values and SENTRY_ORG / SENTRY_PROJECT come from the EAS
+# "production" environment. The update is bundled here, so without them the
+# bundle would ship with no API address and lib/api.ts would throw on every phone.
+#
+# Rollback: run this again with the previous good tag, or use eas update:rollback.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish, for example v1.2.3 (must be the latest)"
+        required: true
+        type: string
+
+concurrency:
+  group: mobile-update
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Check the tag is the latest release
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          if ! echo "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::'$TAG' is not a release tag like v1.2.3."
+            exit 1
+          fi
+          if ! git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "::error::Tag $TAG does not exist."
+            exit 1
+          fi
+          latest=$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1)
+          if [ "$TAG" != "$latest" ]; then
+            echo "::error::$TAG is not the latest release ($latest). Updates go to the latest release only."
+            exit 1
+          fi
+
+  checks:
+    needs: validate
+    uses: ./.github/workflows/mobile-ci.yml
+    with:
+      ref: ${{ inputs.tag }}
+
+  update:
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set up EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: 24.14.0
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      # Bundled with the production EAS environment, so the app gets its API address.
+      - name: Bundle the update
+        run: eas env:exec production "npx expo export --platform ios --platform android --dump-sourcemap" --non-interactive
+
+      - name: Publish the update
+        env:
+          TAG: ${{ inputs.tag }}
+        run: eas update --skip-bundler --channel production --environment production --message "Update for ${TAG}" --non-interactive
+
+      - name: Upload Sentry source maps
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: eas env:exec production "npx sentry-expo-upload-sourcemaps dist" --non-interactive

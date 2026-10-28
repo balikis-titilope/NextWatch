@@ -1,0 +1,4 @@
+# Deep links (spec 0014 rule 6). The export has one page for every movie,
+# "movie/[type]/[id].html"; this serves it for any real title address and keeps
+# the address in the browser. Unknown paths still get a real 404.
+/movie/:type/:id /movie/[type]/[id] 200

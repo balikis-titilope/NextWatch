@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+
+# Only run mobile checks when a staged file is under mobile/.
+# backend/ has no linting/formatting configured yet (see AGENTS.md).
+if git diff --cached --name-only | grep -q '^mobile/'; then
+  cd mobile || exit 1
+  npx lint-staged || exit 1
+  npm run typecheck || exit 1
+fi
