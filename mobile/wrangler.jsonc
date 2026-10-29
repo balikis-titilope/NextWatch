@@ -4,6 +4,11 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "nextwatch-web",
   "compatibility_date": "2026-09-25",
+  // Runs before every deploy so ./dist always exists, even if the Cloudflare
+  // build command is blank.
+  "build": {
+    "command": "npm run build:web",
+  },
   "assets": {
     "directory": "./dist",
     // Unknown paths return the exported 404.html with a real 404 status, so the
