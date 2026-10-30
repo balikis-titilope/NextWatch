@@ -42,7 +42,7 @@ yarn-error.*
 /ios
 /android
 
-assets
+assets/stitch_md_design_system/
 context/
 
 
