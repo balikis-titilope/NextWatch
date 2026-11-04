@@ -322,6 +322,15 @@ def legal_terms():
 def legal_support():
     return FileResponse(os.path.join(LEGAL_DIR, "support.html"), media_type="text/html")
 
+# Shared brand assets for the legal pages above and the delete-account page.
+@app.get("/legal/legal.css")
+def legal_stylesheet():
+    return FileResponse(os.path.join(LEGAL_DIR, "legal.css"), media_type="text/css")
+
+@app.get("/legal/logo.png")
+def legal_logo():
+    return FileResponse(os.path.join(LEGAL_DIR, "logo.png"), media_type="image/png")
+
 def _split_pipe(value):
     """A pipe-joined column (e.g. genres, director) that may be NULL or empty."""
     return value.split("|") if isinstance(value, str) and value else []
@@ -942,8 +951,8 @@ def _delete_account_page(error: str | None = None, success: bool = False) -> str
             "restore it.</p>"
             f"{error_html}"
             '<form method="post" action="/legal/delete-account">'
-            '<label>Email<br><input type="email" name="email" required></label><br><br>'
-            '<label>Password<br><input type="password" name="password" required></label><br><br>'
+            '<label>Email<input type="email" name="email" required></label>'
+            '<label>Password<input type="password" name="password" required></label>'
             '<button type="submit">Delete my account</button>'
             "</form>"
         )
@@ -953,16 +962,17 @@ def _delete_account_page(error: str | None = None, success: bool = False) -> str
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>NextWatch — Delete Account</title>
-<style>
-  body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 20px 64px; line-height: 1.6; color: #1a1612; background: #fdfaf6; }}
-  h1 {{ font-size: 1.5rem; }}
-  input {{ width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem; box-sizing: border-box; }}
-  button {{ padding: 10px 20px; border-radius: 6px; border: none; background: #8a5a3d; color: white; font-size: 1rem; cursor: pointer; }}
-  .error {{ color: #b3261e; }}
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/legal/legal.css" />
+<link rel="icon" href="/legal/logo.png" />
 </head>
 <body>
+<header class="site-header"><div class="site-header-inner"><img src="/legal/logo.png" alt="NextWatch logo" /><span>NextWatch</span></div></header>
+<main class="narrow">
 {body}
+</main>
 </body>
 </html>"""
 
