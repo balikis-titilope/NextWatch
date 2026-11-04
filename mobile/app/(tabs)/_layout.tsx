@@ -3,6 +3,7 @@ import { Tabs } from "expo-router";
 import { AppHeader } from "../../components/AppHeader";
 import { NotificationBell } from "../../components/NotificationBell";
 import { useWindowDimensions } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { WIDE_BREAKPOINT } from "../../constants/config";
 import { useTheme } from "../../hooks/useTheme";
 
@@ -10,6 +11,7 @@ export default function TabsLayout() {
   const theme = useTheme();
   // Wide windows navigate from the header (TopNavLinks); phones get the dock.
   const wide = useWindowDimensions().width >= WIDE_BREAKPOINT;
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -22,6 +24,9 @@ export default function TabsLayout() {
         // A floating dock: inset from the edges, rounded, no top rule.
         tabBarStyle: {
           display: wide ? "none" : "flex",
+          // The library default is 49 + the bottom inset and cut the label text;
+          // a custom height replaces the whole figure, so keep the inset in it.
+          height: 51 + insets.bottom,
           backgroundColor: theme["bg-tertiary"],
           marginHorizontal: 12,
           marginBottom: 8,
